@@ -6,56 +6,61 @@ API controller module containing users endpoints
 from flask import request, jsonify
 from flask.wrappers import Response
 from app.services.user_service import UserService
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, fields, Api, reqparse
+from app.errors import errors
+import logging
+import random
 
-user_api = Namespace("USUARIOS", description=" CRUD usuario")
+user_api = Namespace("Usuarios", description=" CRUD usuario")
+
+user_fields = user_api.model('Nuevo Usuario', {
+    'name': fields.String(description='Nombre Completo', required=True),
+    'age': fields.Integer(min=1, required=True),
+})
 
 @user_api.route("/users")
+
 class UsersDAO(Resource):
-    """ Endpoint  usuarios
-    Esta clase contiene los endpoints relacionados a obtener usuarios y crear nuevos usuarios
-    """
-    @user_api.expect(validate=True)
+
     def get(self) -> Response:
-        """ List users
-        GET : /api/v1/users
-        """
-
-        """
-        if not request.json:
-            return Response(status=errors['BadRequest'].get('status'), response=errors['BadRequest'].get('response'))
-        """
-        api_data = request.json
-
         try:
-            users = UserService.get_many_service()
-        except (Exception,):
-            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
-        api_data['users'] = users
-        return jsonify(api_data)
+            users = UserService.get_list()
+            return jsonify(list(users))
+        except Exception as e:
+            logging.exception(e)
+            return False
 
+    @user_api.doc(params={'name': {'description': 'nombre usuario', 'in': 'data', 'type': 'string'},
+                 'age': {'description': 'Edad', 'in': 'data', 'type': 'int'}})
+    @user_api.doc(model=user_fields)
     def post(self) -> Response:
-        """ Insert new user
-        POST : /api/v1/users
-        """
-        return jsonify("new")
+        try:
+            logging.info(f" request json -> {str(request.json())}")
+            result = UserService.create()
+            return jsonify(list(result))
+        except Exception as e:
+            logging.exception(e)
+            return False
 
 @user_api.route("/user/<string:user_id>")
-#@user_api.doc(params={'uid': {'description': 'user UID'},
-                # 'param1': {'description': 'blabla', 'in': 'query', 'type': 'int'}})
 class UserDAO(Resource):
-    """ Endpoint usuario
-    Esta clase contiene los endpoints de editar un usuario y eliminar un usuario
-    """
+
     @user_api.expect(validate=True)
-    def put(self, user_id) -> Response:
-        """ Edit one user
-        PUT : /api/v1/users/{userId}
-        """
-        return jsonify(user_id)
+
+    @user_api.doc(params={
+        'name': {'description': 'Nombre del usuario', 'in': 'form'},
+        'age': {'description': 'Edad del usuario', 'in': 'form', 'type': 'int'}
+        })
+    def put(self, user) -> Response:
+        try:
+            UserService.update(user)
+        except (Exception,):
+            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
+        return jsonify(user)
 
     def delete(self, user_id) -> Response:
-        """ Delete one user
-        DELETE : /api/v1/users
-        """
-        return jsonify("delete")
+        try:
+            UserService.delete(user_id)
+        except (Exception,):
+            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
+        return jsonify(user_id)

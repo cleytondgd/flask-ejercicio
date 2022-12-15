@@ -1,14 +1,14 @@
 from app import mongo
-from app.models.user_model import User
+from app.models.entity_model import Entity
 import logging
 
-class UserService(object):
+class EntityService(object):
 
     @staticmethod
-    def create(name, age):
+    def create(name, address):
         try:
-            newUser = User(name, age)
-            result = newUser.create()
+            newEntity = Entity(name, address)
+            result = newEntity.create()
             return result
         except Exception as e:
             logging.exception(e)
@@ -17,25 +17,25 @@ class UserService(object):
     @staticmethod
     def get_list():
         try:
-            users = User.getList()
-            return users
+            entities = Entity.getList()
+            return entities
         except Exception as e:
             logging.exception(e)
             return False
 
     @staticmethod
-    def update(user):
+    def update(entity):
         try:
-            result = User.update(user)
+            result = Entity.update(entity)
             return result
         except Exception as e:
             logging.exception(e)
             return False
 
     @staticmethod
-    def delete(user_id):
+    def delete(entity_id):
         try:
-            result = User.delete(user_id)
+            result = Entity.delete(entity_id)
             return result
         except Exception as e:
             logging.exception(e)

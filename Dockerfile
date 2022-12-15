@@ -1,10 +1,14 @@
 FROM alpine:3.10
+RUN apk add --no-cache && pip3 install --upgrade pip
 
-RUN apk add --no-cache python3-dev \
-    && pip3 install --upgrade pip
+ENV VIRTUAL_ENV=/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-WORKDIR /app
-COPY . /app
+# Install dependencies:
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-RUN pip3 --no-cache-dir install -r requirements.txt
-CMD ["python3", "app/main.py"]
+# Run the application:
+COPY main.py .
+CMD ["python", "main.py"]
