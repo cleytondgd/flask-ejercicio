@@ -23,11 +23,11 @@ class UserService(object):
             logging.exception(e)
             return False
 
-    @staticmethod
-    def update(user):
+
+    def update(user_id, name, age):
         try:
-            result = User.update(user)
-            return result
+            result = User.update(user_id, name, age)
+            return str(result)
         except Exception as e:
             logging.exception(e)
             return False

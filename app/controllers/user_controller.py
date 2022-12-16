@@ -30,14 +30,16 @@ class UsersDAO(Resource):
             logging.exception(e)
             return False
 
-    @user_api.doc(params={'name': {'description': 'nombre usuario', 'in': 'data', 'type': 'string'},
-                 'age': {'description': 'Edad', 'in': 'data', 'type': 'int'}})
+    @user_api.doc(params={'name': {'description': 'nombre usuario', 'in': 'formData', 'type': 'string'},
+                 'age': {'description': 'Edad', 'in': 'formData', 'type': 'int'}})
     @user_api.doc(model=user_fields)
+
     def post(self) -> Response:
         try:
-            logging.info(f" request json -> {str(request.json())}")
-            result = UserService.create()
-            return jsonify(list(result))
+            age = int(request.form['age'])
+            name = request.form['name']
+            result = UserService.create(name, age)
+            return jsonify(result)
         except Exception as e:
             logging.exception(e)
             return False
@@ -47,20 +49,22 @@ class UserDAO(Resource):
 
     @user_api.expect(validate=True)
 
-    @user_api.doc(params={
-        'name': {'description': 'Nombre del usuario', 'in': 'form'},
-        'age': {'description': 'Edad del usuario', 'in': 'form', 'type': 'int'}
-        })
-    def put(self, user) -> Response:
+    @user_api.doc(params={'name': {'description': 'nombre usuario', 'in': 'formData', 'type': 'string'},
+                 'age': {'description': 'Edad', 'in': 'formData', 'type': 'int'}})
+
+    def put(self,user_id) -> Response:
         try:
-            UserService.update(user)
-        except (Exception,):
+            age = int(request.form['age'])
+            name = request.form['name']
+            UserService.update(user_id, name, age)
+            return jsonify(user)
+        except (Exception):
             return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
-        return jsonify(user)
 
     def delete(self, user_id) -> Response:
         try:
-            UserService.delete(user_id)
-        except (Exception,):
-            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
-        return jsonify(user_id)
+            result = UserService.delete(user_id)
+            return jsonify(result)
+        except Exception as e:
+            logging.exception(e)
+            return False

@@ -1,19 +1,21 @@
 from app import mongo
+from bson.json_util import dumps,RELAXED_JSON_OPTIONS
+import json
+from flask import jsonify
 import logging
 import random
 
 class User():
     def __init__(self, name, age):
-        self.name = str(name),
-        self.age = int(age),
-        self.user_id = str(random.randint(1,1000))
+        self.user_id = str(random.randint(1,1000)),
+        self.age = age,
+        self.name = name
 
-
-    @staticmethod
-    def create():
+    @classmethod
+    def create(self):
         try:
-            result = mongo.db.users.insertOne(self.to_json())
-            return result
+            result_id = mongo.db.users.insert_one({ "user_id": self.user_id,  "age": self.age, "name": self.name }).inserted_id
+            return str(result_id)
         except Exception as e:
             logging.exception(e)
             return None
@@ -27,16 +29,15 @@ class User():
             logging.exception(e)
             return None
 
-    @staticmethod
-    def update(user):
+    @classmethod
+    def update(self,user_id, name, age):
         try:
-            result = mongo.db.users.updateOne({"user_id": user.id},
-                {"$set": {
-                    "name": user.name,
-                    "age": user.age,
-                }}
-            )
-            return result
+            logging.info(f"SALIDAAAAAA:  {user_id}/{name}/{age}")
+            finding = { "user_id": user_id }
+            newValues = { "$set": { "name": name, "age": age}}
+
+            result = mongo.db.users.update_one(finding, newValues)
+            return str(result)
         except Exception as e:
             logging.exception(e)
             return None
@@ -44,14 +45,15 @@ class User():
     @staticmethod
     def delete(user_id):
         try:
-            result = mongo.db.deleteOne({"user_id": user_id})
-            return result
+            result = mongo.db.users.delete_one({"user_id": user_id})
+            return f"Deleted user count: {str(result.deleted_count)}"
         except Exception as e:
             logging.exception(e)
             return None
 
+    @classmethod
     def to_json(self):
-        return{
+        return {
             'user_id': self.user_id,
             'name': self.name,
             'age': self.age

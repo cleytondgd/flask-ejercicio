@@ -3,20 +3,21 @@ import logging
 import random
 
 class Entity():
+
     def __init__(self, name, address):
         self.name = str(name),
         self.address = str(address),
         self.entity_id = str(random.randint(1,1000))
 
-
-    @staticmethod
-    def create():
+    @classmethod
+    def create(self):
         try:
-            result = mongo.db.entities.insertOne(self.to_json())
-            return result
+            result_id = mongo.db.entitites.insert_one({ "entity_id": self.entity_id,  "address": self.address, "name": self.name }).inserted_id
+            return str(result_id)
         except Exception as e:
             logging.exception(e)
             return None
+
 
     @staticmethod
     def getList():
@@ -44,8 +45,8 @@ class Entity():
     @staticmethod
     def delete(entity_id):
         try:
-            result = mongo.db.entities.deleteOne({"entity_id": entity_id})
-            return result
+            result = mongo.db.entities.delete_one({"entity_id": entity_id})
+            return f"Deleted entity count: {str(result.deleted_count)}"
         except Exception as e:
             logging.exception(e)
             return None
