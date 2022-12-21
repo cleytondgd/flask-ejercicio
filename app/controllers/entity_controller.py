@@ -11,18 +11,19 @@ from app.errors import errors
 
 entity_api = Namespace("Entidades", description=" CRUD Entidades")
 
+
 @entity_api.route("/entities")
 class entitiesDAO(Resource):
     """ Endpoint entidades
     Esta clase contiene los endpoints relacionados a obtener entidades y crear nuevos Entidades
     """
     @entity_api.expect(validate=True)
-
     def get(self) -> Response:
         try:
             entities = EntityService.get_list()
         except (Exception,):
-            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
+            return Response(status=errors['ServerError'].get(
+                'status'), response=errors['ServerError'].get('response'))
         return jsonify(list(entities))
 
     def post(self, entity) -> Response:
@@ -32,11 +33,12 @@ class entitiesDAO(Resource):
         try:
             """# EntityService.insert(entity)"""
         except (Exception,):
-            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
+            return Response(status=errors['ServerError'].get(
+                'status'), response=errors['ServerError'].get('response'))
         return jsonify("new")
 
-@entity_api.route("/entity/<string:entity_id>")
 
+@entity_api.route("/entity/<string:entity_id>")
 class entityDao(Resource):
     """ Endpoint institucion
     Esta clase contiene los endpoints de editar un institucion y eliminar un institucion
@@ -46,12 +48,14 @@ class entityDao(Resource):
         try:
             """# EntityService.update(entity)"""
         except (Exception,):
-            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
+            return Response(status=errors['ServerError'].get(
+                'status'), response=errors['ServerError'].get('response'))
         return jsonify(entity)
 
     def delete(self, entity) -> Response:
         try:
             """#EntityService.delete(entity)"""
         except (Exception,):
-            return Response(status=errors['ServerError'].get('status'), response=errors['ServerError'].get('response'))
+            return Response(status=errors['ServerError'].get(
+                'status'), response=errors['ServerError'].get('response'))
         return jsonify(entity)
