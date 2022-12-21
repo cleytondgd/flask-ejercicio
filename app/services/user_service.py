@@ -2,8 +2,8 @@ from app import mongo
 from app.models.user_model import User
 import logging
 
-class UserService(object):
 
+class UserService(object):
     @staticmethod
     def create(name, age):
         try:
@@ -22,7 +22,6 @@ class UserService(object):
         except Exception as e:
             logging.exception(e)
             return False
-
 
     def update(user_id, name, age):
         try:

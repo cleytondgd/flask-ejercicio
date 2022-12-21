@@ -2,8 +2,8 @@ from app import mongo
 from app.models.entity_model import Entity
 import logging
 
-class EntityService(object):
 
+class EntityService(object):
     @staticmethod
     def create(name, address):
         try:

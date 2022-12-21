@@ -1,0 +1,22 @@
+db.users.insertMany(
+    [{
+        name: 'John',
+        age: 26,
+    },
+    {
+        name: 'Doe',
+        age: 29
+    }]
+)
+db.entities.insertMany(
+    [{
+        entity_id: "1",
+        address: "blanco encalada 980",
+        name: "Sernac"
+    },
+    {
+        entity_id: "2",
+        address: "san juan 134",
+        name: "Compin viña del mar"
+    }]
+)
